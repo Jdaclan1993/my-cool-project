@@ -35,3 +35,7 @@ The test statistic \(H\) approximately follows a chi‑square distribution with 
 
 - Kruskal, W. H., & Wallis, W. A. (1952). Use of ranks in one‑criterion variance analysis. *Journal of the American Statistical Association*, 47(260), 583‑621.
 - Siegel, S., & Castellan, N. J. (1988). *Nonparametric Statistics for the Behavioral Sciences* (2nd ed.). McGraw‑Hill.
+
+## Status
+
+Current git status: clean (no uncommitted changes). Last commit: 38a3550 (docs: add H-statistic documentation to AGENTS.md and SAP-HIERATIC.md).
