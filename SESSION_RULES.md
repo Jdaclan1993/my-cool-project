@@ -1,0 +1,140 @@
+# Claude Code Session Management Cheat Sheet
+
+## Verified Commands (source: /help + official docs)
+
+### Context Management
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| Context bloated, drifting, or stuck | `/clear` | Full wipe — starts empty session. Old session saved, resumable via `/resume` |
+| Context filling up but need continuity | `/compact [focus]` | Compresses history into summary. Keeps key decisions, drops noise. NOT a full wipe |
+| Claude made wrong change, need undo | `/rewind` | Rolls back to earlier checkpoint. Also `/undo`, `/checkpoint` |
+| Quick question, don't pollute context | `/btw <question>` | Answered in isolation. Zero impact on main conversation context |
+| Fork conversation at this point | `/branch [name]` | Preserves original, creates parallel branch. Also `/fork` |
+| Switch to saved session | `/resume [id\|name]` | Opens session picker or loads by ID. Also `/continue` |
+
+### Token & Cost Visibility
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| See token usage and cost | `/usage` | Shows session cost, plan limits, activity stats. Aliases: `/cost`, `/stats` |
+| Visual context map | `/context [all]` | Colored grid of context usage with optimization tips |
+
+### Model & Effort Control
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| Switch model mid-session | `/model sonnet` | Immediate model change (sonnet/opus/haiku or full IDs) |
+| Reduce/increase reasoning | `/effort low\|medium\|high\|xhigh` | Controls extended thinking budget. `max` is session-only |
+| Toggle fast output mode | `/fast on\|off` | Faster token generation (no model downgrade) |
+
+### Session Persistence
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| Keep working across turns | `/goal <condition>` | Claude won't stop until condition met. `/goal clear` to cancel |
+| Run in background | `/background [prompt]` | Detaches session. Also `/bg` |
+| List background tasks | `/tasks` | Shows running background agents and shells |
+
+### Config & Diagnostics
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| Change any setting | `/config` | Opens settings UI (model, theme, permissions, hooks, env vars) |
+| Diagnose issues | `/doctor` | Verifies installation, connectivity, settings |
+| Manage permissions | `/permissions` | Allow/ask/deny rules for tools. Also `/allowed-tools` |
+| Analyze sessions | `/insights` | Report on your usage patterns across sessions |
+| Edit memory files | `/memory` | Manage auto-memory and CLAUDE.md entries |
+
+### Code Review & Quality
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| Review a PR | `/review <PR>` | Local PR review |
+| Security audit | `/security-review` | Security analysis of branch changes |
+| Verify change works | `/verify` | Build, run, and observe a change |
+| Deep cloud review | `/ultrareview <PR>` | Multi-agent review in cloud sandbox |
+| Parallel refactor | `/batch <instruction>` | 5-30 worktree agents in parallel, each gets a PR |
+
+### Planning
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| Plan before coding | `/plan [description]` | Enter plan mode — design first, get approval, then implement |
+| Cloud-scale plan | `/ultraplan <prompt>` | Draft plan, review in browser, execute remotely |
+
+### Miscellaneous
+| Trigger | Command | Effect |
+|---------|---------|--------|
+| Show all commands | `/help` | Full command list |
+| List skills | `/skills` | Available skills with descriptions |
+| Export conversation | `/export [filename]` | Plain text export |
+| Copy last response | `/copy [N]` | Copy assistant response to clipboard |
+| Interactive diff | `/diff` | Per-turn diff viewer |
+| Rename session | `/rename [name]` | Names current session for easy `/resume` |
+
+---
+
+## Session Lifecycle
+
+```
+New task (unrelated) → /clear (fresh context, no baggage)
+New task (related)   → keep going or /compact to free space
+Claude off-track     → /rewind (rolls back to last good checkpoint)
+Context getting full → /context (diagnose), then /compact
+Need token count     → /usage (or /cost, /stats)
+Big subsystem change → /plan (design first, don't just code)
+Verify a fix         → /verify (build + run + observe)
+Review before merge  → /review or /security-review
+Long-running work    → /goal to keep Claude working across turns
+```
+
+**Ideal pattern for a work session:**
+1. Start with `/clear` or `/resume` appropriate session
+2. `/plan` for any non-trivial change
+3. `/goal` if the task spans multiple turns
+4. `/compact` when responses slow down or get repetitive
+5. `/usage` periodically to monitor token burn
+6. `/clear` when switching to a completely different feature/area
+
+---
+
+## When to Reset (30-60 Minute Rule)
+
+**Honest assessment:** The 30-60 minute rule is not an official Anthropic recommendation, but it reflects a real phenomenon. Context accumulates rapidly — tool outputs, diffs, file contents, and conversation history all fill the window. After 500K-800K tokens, Claude can become less precise, repeat itself, or fixate on earlier context at the expense of new instructions.
+
+**I agree partial resets help.** Full `/clear` every 30-60 minutes is too aggressive — you lose all accumulated project understanding. Better approach: **strategic compaction + goal-based continuity.**
+
+### Signs you need a reset:
+- Claude repeats the same suggestion or fix multiple times
+- Claude references files or decisions from 10+ turns ago that are no longer relevant
+- Responses get noticeably slower (compaction hasn't triggered yet)
+- `/usage` shows 700K+ tokens consumed
+- Claude misunderstands new instructions because old context dominates
+- Tool call errors increase (file not found for files you renamed hours ago)
+
+### Reset prompt template:
+```
+Summarize in 5 bullet points: (1) what we accomplished, (2) what's still in progress,
+(3) key decisions made, (4) files changed, (5) what to do next. Then /clear.
+```
+After `/clear`, paste the summary so the new session has exactly the context it needs — no more, no less.
+
+### Alternative to full reset:
+- `/compact` with a focus instruction: `/compact Keep: current CLAUDE.md structure, settings.json model change, and the SESSION_RULES.md we're writing. Drop: all git status chatter from earlier.`
+- This is better than `/clear` when you're mid-task and want to keep momentum.
+
+---
+
+## Research Notes
+
+### /config findings for unverified settings:
+- **`MAX_THINKING_TOKENS`** — Confirmed as an **env var** (not a settings.json key). Set via `env.MAX_THINKING_TOKENS` in settings.json or as a shell env var. On models with adaptive reasoning (Opus 4.7), this has limited effect — use `/effort` instead.
+- **Subagent model** — Confirmed key: `CLAUDE_CODE_SUBAGENT_MODEL` (env var, not settings.json key). Sets model for ALL subagents. Individual per-agent models exist but are configured via `~/.claude.json`, not settings.json.
+- **Compaction** — No dedicated settings key exists. Compaction is fully automatic. The closest controls are `skillListingBudgetFraction` and `maxSkillDescriptionChars` (for skill listing budget, not compaction itself).
+
+### Key env vars worth adding to settings.json:
+```json
+{
+  "model": "sonnet",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+  }
+}
+```
+This runs the main thread on Sonnet and subagents on Haiku — additional token savings.
+
+### Expected commands NOT found: None. All commands I recalled (/plan, /rewind, /clear, /compact, /usage) are confirmed in /help output.
