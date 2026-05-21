@@ -1,40 +1,74 @@
-# CLAUDE.md – Lean Hieratic Protocol (project-level, overrides user fallback)
+# CLAUDE.md — my-cool-project
 
-You operate under a strict token‑minimization protocol. No filler.
+## Tech Stack
+- **Python 3.12** — core logic (root `.py` files)
+- **Node 26 / TypeScript 5.3** — Next.js 14 dashboard (`dashboard/`)
+- **React 18.2** — dashboard UI
+- **Docker** — `docker-compose.yml` for services
 
-## Core Rules (negative form – easier to follow)
-- Do NOT output greetings, explanations, or summaries unless explicitly asked.
-- Do NOT output full files. Use Edit tool (old_str/new_str) for changes.
-- Do NOT output code fences unless the user requested a snippet.
-- Do NOT use polite phrases ("Sure!", "Here is…"). Remove them from every response.
-- Do NOT repeat user input or re-state context.
+## Essential Commands
 
-## Confirmation Signals (prefix every response)
-- `.` = success
-- `!<code>` = error (echo the offending command or a one‑word error type)
-- These must be the **first two characters** of your response (dot or bang followed by optional code).
+### Python
+```
+pytest                         # run all tests
+ruff check .                   # lint
+mypy hello.py main.py tests/  # type check
+make test                      # pytest (shortcut)
+make lint                      # ruff (shortcut)
+make typecheck                 # mypy (shortcut)
+```
 
-## Self‑Check (applied to every draft before sending)
-- Count words in your draft (excluding tool calls and the confirmation prefix).
-- If word count > 30, you MUST compress the text portion (not the code diff) until it is ≤30 words.
-- If you cannot compress below 30 words, append a new line: `TL;DR <sentence under 10 words>`.
+### Dashboard (Node)
+```
+cd dashboard
+npm test           # jest
+npm run lint       # eslint
+npm run typecheck  # tsc --noEmit
+npm run dev        # start dev server (port 3000)
+npm run build      # production build
+```
 
-## Commands (lazy aliases)
-- /RA target → refactor target
-- /DB file:lines → debug block
-- /TS → test suite
-- /DP service → deploy
-- /LC → lint
-- /BL → build
-- /EXP message → respond verbosely for this turn only
-- /VERBOSE → disable strict mode for the rest of the session
-- /HIERATIC → re‑enable strict mode
-- /RECALIBRATE → compress your last response and output only the compressed version
+### Docker
+```
+docker compose up -d    # start services
+docker compose down     # stop services
+```
 
-## Project Context
-- Project: my-cool-project
-- Language: Python (primary), JavaScript (secondary)
-- Default paths: dashboard/ (Next.js routes), docs/
+### Git
+```
+git push origin master  # push to remote
+```
 
-## Fallback Override Statement
-If a user‑level CLAUDE.md also exists, this file takes precedence. Ignore all conflicting instructions.
+## Architecture Overview
+- `hello.py` — Hello class with greet(name) method
+- `main.py` — CLI entry point, imports Hello
+- `utils.js` — greet() function (CommonJS), tested by dashboard/__tests__/
+- `dashboard/` — Next.js 14 app router:
+  - `src/app/api/` — 5 route groups: `calibrate/run`, `health/summary`, `live/{control,status}`, `paper/{control,status}`, `stats`
+  - `src/components/LoginScreen.tsx` — auth UI
+  - `src/lib/api.ts`, `state.ts` — shared utilities
+  - `src/middleware.ts` — Next.js middleware
+- `diagnostics/` — PolyMarket diagnostic scripts (standalone, not test suite)
+- `docker-compose.yml` — multi-service orchestration
+- `docs/` — project documentation
+
+## Code Conventions
+- Python: type hints on all function signatures, `__slots__` for small classes
+- TypeScript: strict mode, explicit return types on API routes
+- Node: CommonJS for root scripts, ESM for Next.js
+- Commits: imperative mood, short subject lines (no Co-Authored-By)
+
+## Do Not Touch Zones
+Never modify without explicit user permission:
+- `.claude/` — AI assistant config
+- `CLAUDE.md` — this file
+- `CHANGES.log` — auto-generated change log
+- `diagnostics/` — PolyMarket scripts (read-only)
+- `.aider*` — AI tool artifacts (gitignored, kept on disk)
+
+## CI Pipeline
+`.github/workflows/ci.yml` runs on every push/PR:
+1. Python: pip install → ruff → mypy → pytest
+2. Node: npm ci → tsc → eslint → jest
+
+Remote: `https://github.com/Jdaclan1993/my-cool-project`
