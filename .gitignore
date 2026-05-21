@@ -1,10 +1,41 @@
-.aider*
-.env
-dashboard/node_modules
-dashboard/.next
-*.tsbuildinfo
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Environment & secrets
+.env
+.venv/
+venv/
+env/
+
+# AI tools (exclude from Git, keep on disk)
 .claude/
+.aider*
+
+# Logs & auto-generated changelogs
 CHANGES.log
-docs/
+*.log
+
+# Testing & coverage
+.pytest_cache/
+.mypy_cache/
+coverage/
+htmlcov/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
