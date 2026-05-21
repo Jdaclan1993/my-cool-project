@@ -1,3 +1,14 @@
+# Production dependencies (hello.py, main.py: stdlib only)
+
+# Diagnostic/utility script dependencies
+psutil==7.2.2
+python-dotenv==1.2.1
+web3==7.16.0
+eth-abi==6.0.0b1
+eth-utils==6.0.0
+py_clob_client_v2==1.0.1
+
+# Development dependencies (testing, linting, type checking)
 pytest==9.0.2
 ruff==0.15.14
 mypy==2.1.0
