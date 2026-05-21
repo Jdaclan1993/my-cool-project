@@ -1,0 +1,10 @@
+.aider*
+.env
+dashboard/node_modules
+dashboard/.next
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.claude/
+CHANGES.log
+docs/

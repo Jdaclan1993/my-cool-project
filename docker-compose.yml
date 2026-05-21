@@ -1,0 +1,12 @@
+services:
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "29392:29392"
+    environment:
+      PORT: "29392"
+      DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      DASHBOARD_PIN: ${DASHBOARD_PIN}
+    restart: unless-stopped

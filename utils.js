@@ -1,17 +1,12 @@
-
+/**
+ * @param {string} [name]
+ * @returns {string}
+ */
 function greet(name) {
-    try {
-        if (typeof name !== 'string' || !name.trim()) {
-            return 'Hello, Guest!';
-        }
-        const trimmed = name.trim();
-        if (trimmed.length > 100) {
-            return `Hello, ${trimmed.substring(0, 100)}...!`;
-        }
-        return `Hello, ${trimmed}!`;
-    } catch (error) {
-        return 'Hello, Guest!';
-    }
+    const s = typeof name === "string" ? name.trim() : "";
+    if (!s) return "Hello, Guest!";
+    if (s.length > 100) return `Hello, ${s.slice(0, 100)}...!`;
+    return `Hello, ${s}!`;
 }
 
 module.exports = { greet };
