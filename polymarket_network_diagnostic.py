@@ -8,21 +8,16 @@ Usage:  python polymarket_network_diagnostic.py [--duration 300] [--output repor
 
 import asyncio
 import json
-import os
 import platform
 import socket
 import ssl
 import statistics
-import struct
-import subprocess
 import sys
 import time
-from collections import defaultdict
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Optional
 
-import urllib.request
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
@@ -270,7 +265,6 @@ async def run_traceroute(target: str) -> TracerouteResult:
 def time_request(url: str, method: str = "GET") -> ApiTiming:
     """Measure DNS, connect, TLS, TTFB for an HTTPS request."""
     from urllib.parse import urlparse
-    import http.client
 
     parsed = urlparse(url)
     host = parsed.hostname
@@ -417,7 +411,7 @@ async def run_ws_diagnostics(duration_pings: int = WS_PING_COUNT) -> WsDiagnosti
 
             # Ping-pong RTT measurements
             for i in range(duration_pings):
-                payload = f"ping_{i}_{int(time.time()*1000)}"
+                f"ping_{i}_{int(time.time()*1000)}"
                 t_ping = time.monotonic()
                 try:
                     pong = await ws.ping()
