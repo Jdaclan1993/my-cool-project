@@ -138,3 +138,49 @@ After `/clear`, paste the summary so the new session has exactly the context it 
 This runs the main thread on Sonnet and subagents on Haiku — additional token savings.
 
 ### Expected commands NOT found: None. All commands I recalled (/plan, /rewind, /clear, /compact, /usage) are confirmed in /help output.
+
+---
+
+## Parallel Worktrees
+
+### Creation Commands
+```powershell
+git -C "C:\Users\julius daclan jr\Documents\my-cool-project" worktree add "C:\Users\julius daclan jr\Documents\my-cool-project-feature" -b feature/new-feature
+
+git -C "C:\Users\julius daclan jr\Documents\my-cool-project" worktree add "C:\Users\julius daclan jr\Documents\my-cool-project-bugfix" -b bugfix/hotfix
+
+git -C "C:\Users\julius daclan jr\Documents\my-cool-project" worktree add "C:\Users\julius daclan jr\Documents\my-cool-project-review" -b review/exploration
+```
+
+### Environment Setup (first time per worktree)
+```powershell
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+cd dashboard && npm ci
+```
+
+### Launching Claude Code
+```powershell
+cd "C:\Users\julius daclan jr\Documents\my-cool-project-feature" && claude
+cd "C:\Users\julius daclan jr\Documents\my-cool-project-bugfix" && claude
+cd "C:\Users\julius daclan jr\Documents\my-cool-project-review" && claude
+```
+
+### Daily Workflow
+| Worktree | Branch | Purpose | Terminal |
+|----------|--------|---------|----------|
+| `my-cool-project` | `master` | Ongoing work, commits, pushes | Tab 1 (main) |
+| `my-cool-project-feature` | `feature/new-feature` | New feature branch, multi-commit work | Tab 2 |
+| `my-cool-project-bugfix` | `bugfix/hotfix` | Hotfix, fast turnaround | Tab 3 |
+| `my-cool-project-review` | `review/exploration` | PR review, experimentation, throwaway | Tab 4 |
+
+Each worktree runs in its own terminal tab. Color-code tabs or label them to avoid confusion.
+
+### Cleanup
+```powershell
+git worktree remove "C:\Users\julius daclan jr\Documents\my-cool-project-feature"
+git branch -d feature/new-feature   # only if fully merged
+```
+
+### Shared Resource Warning
+`.venv/` and `node_modules/` are gitignored and must be recreated in each new worktree. See Environment Setup above. Each worktree gets its own copy — no sharing between worktrees.
