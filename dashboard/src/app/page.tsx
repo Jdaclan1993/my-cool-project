@@ -202,7 +202,7 @@ function PaperWorkspace({ paperState, stats, apiPost }: { paperState: PaperState
   );
 }
 
-function LiveWorkspace({ liveState, stats, apiPost }: { liveState: LiveState; stats: Stats; apiPost: ApiPostFn }) {
+function LiveWorkspace({ liveState, stats: _stats, apiPost }: { liveState: LiveState; stats: Stats; apiPost: ApiPostFn }) {
   const isRunning = liveState.liveActive;
   const ul = liveState.unlockLevel;
 
@@ -240,7 +240,7 @@ function LiveWorkspace({ liveState, stats, apiPost }: { liveState: LiveState; st
   );
 }
 
-function HealthWorkspace({ health, stats, apiPost }: { health: Health; stats: Stats; apiPost: ApiPostFn }) {
+function HealthWorkspace({ health, stats: _stats, apiPost }: { health: Health; stats: Stats; apiPost: ApiPostFn }) {
   const dp = health.dataPipeline;
   const sa = health.signalAgents;
   const mj = health.metaJudge;

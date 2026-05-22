@@ -8,7 +8,7 @@ export function err(message: string, status = 400) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export function methodNotAllowed(allowed: string[]) {
+export function methodNotAllowed(_allowed: string[]) {
   return err("Method not allowed", 405);
 }
 
