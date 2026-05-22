@@ -23,6 +23,13 @@ export default [
         __filename: "readonly",
       },
     },
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["error", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_"
+      }],
+    },
   },
   {
     ignores: ["node_modules/", ".next/", "jest.config.js", "__tests__/"],
