@@ -23,7 +23,7 @@ jobs:
         run: mypy hello.py main.py tests/
 
       - name: Test (Python)
-        run: pytest
+        run: pytest tests/
 
       - name: Set up Node
         uses: actions/setup-node@v4
