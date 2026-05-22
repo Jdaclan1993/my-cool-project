@@ -1,0 +1,22 @@
+﻿{
+  "model": "sonnet",
+  "effortLevel": "low",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -File \"C:\\Users\\julius daclan jr\\Documents\\my-cool-project\\verify.ps1\"",
+            "timeout": 60,
+            "statusMessage": "Running verification suite..."
+          }
+        ]
+      }
+    ]
+  }
+}
