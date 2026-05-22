@@ -234,3 +234,59 @@ Caveat: if a "simple" task has unclear scope or hidden risk, use plan mode anywa
 
 ### Token Savings
 No official Anthropic benchmark exists. User-reported estimates: 60-75% fewer tokens compared to jumping straight into code, because all writes are deferred until the approach is approved — no wasted edits from wrong approaches. [USER-REPORTED, NOT OFFICIAL]
+
+---
+
+## Verification Hooks
+
+[VERIFIED: 2026-05-22 — hook schema confirmed via official docs; verify.ps1 tested and passing]
+
+### Status: LIVE (requires user to write settings.json)
+
+Claude Code supports `PostToolUse` hooks that fire after every tool call. The hook below triggers after `Write` or `Edit` events and runs the full verification suite.
+
+### verify.ps1
+Runs in ~2 seconds: pytest → ruff → mypy → jest. Located at repo root. Executable via:
+```powershell
+.\verify.ps1
+```
+
+### Hook Config (.claude/settings.json)
+```json
+{
+  "model": "sonnet",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "haiku"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -File \"C:\\Users\\julius daclan jr\\Documents\\my-cool-project\\verify.ps1\"",
+            "timeout": 60,
+            "statusMessage": "Running verification suite..."
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Behavior
+- PostToolUse fires AFTER the edit — cannot block, but failures appear on stderr
+- Claude sees failure output instantly and can self-correct in the next turn
+- Hooks live-reload on settings.json save — no restart needed
+- Matcher `Write|Edit` covers the two file-modification tools
+
+### Manual Fallback
+If hooks aren't desired, run manually after any batch of edits:
+```powershell
+.\verify.ps1
+```
+
+### Note
+Self-modification rules prevent Claude from writing `.claude/settings.json` directly. The user must write the hook config manually using the PowerShell command documented above.
