@@ -290,3 +290,79 @@ If hooks aren't desired, run manually after any batch of edits:
 
 ### Note
 Self-modification rules prevent Claude from writing `.claude/settings.json` directly. The user must write the hook config manually using the PowerShell command documented above.
+
+---
+
+## One Objective Per Session
+
+### Why It Matters
+Context accumulates every turn. When the objective drifts mid-session, old decisions, file reads, and tool outputs from the original task remain in the window — competing with new instructions. This causes:
+- Claude fixates on earlier context at the expense of new guidance
+- Response quality degrades as irrelevant context dominates
+- Token waste from carrying dead weight
+
+### How to Frame a Goal
+Use `/goal <condition>`. Principle: state the outcome, not the steps. Good goals are verifiable — you know when they're done. Bad goals are open-ended or too broad.
+
+### Good Examples (This Project)
+| Goal | Why good |
+|------|----------|
+| "Add input validation with tests to hello.py greet function" | Single file, testable, clear finish line |
+| "Create a new /api/status endpoint in the dashboard returning health JSON" | One route group, measurable output |
+| "Explain what polymarket_network_diagnostic.py does and whether its deps are still needed" | Read-only analysis, bounded scope |
+
+### Bad Example
+"Improve the dashboard" — too broad. Which page? What improvement? How do you know it's done? This becomes a wandering session.
+
+### Subagent/Worktree Fallback
+Claude Code spawns subagents automatically for parallel tasks — no manual spawn command exists (`/agents` manages configs only). For large subsystems that need isolated exploration:
+1. Open a new terminal tab in a parallel worktree (see Parallel Worktrees section above)
+2. Run `claude` there with the subsystem's scope
+3. Copy results back to the main session
+This keeps each session's context focused while parallelizing real work.
+
+---
+
+## 5-Minute Validation Routine
+
+[VERIFIED: 2026-05-22 — executed live in this session; all 4 stages passed]
+
+### The 5 Steps
+Run this at the start of any session, or after a `/clear`, to confirm everything works.
+
+```
+Step 1 — Structure check
+  Ask Claude: "Explain the top-level structure of this project in 3-4 bullets."
+  Verifies: Can Claude read and understand the codebase?
+
+Step 2 — Propose a change
+  Ask Claude: "Propose one tiny safe change (docstring, comment, test name). Show the exact edit."
+  Verifies: Can Claude propose correct, scoped, reviewable changes?
+
+Step 3 — Human review
+  Review the edit yourself. Approve or reject.
+  Verifies: Is the human review loop working?
+
+Step 4 — Verify diff
+  Run: git diff
+  Confirm the diff matches what you approved.
+  Verifies: Can the human verify Claude's output?
+
+Step 5 — Safety net
+  Run: .\verify.ps1
+  Or for POSIX: .venv/bin/python -m pytest tests/ -q && ruff check . && ...
+  All 4 stages must pass (pytest, ruff, mypy, jest).
+  Verifies: Is the automated safety net active?
+```
+
+### Verification Commands
+```powershell
+git diff                          # Step 4: inspect the change
+.\verify.ps1                      # Step 5: full verification suite
+```
+
+### Hook Confirmation (Future Sessions)
+In future sessions with the hook active, watch for `Running verification suite...` after every file edit. If it doesn't appear:
+1. Run `cat .claude\settings.json` and confirm the `hooks` key is present
+2. Run `/hooks` to check hook status
+3. Run `.\verify.ps1` manually as fallback
