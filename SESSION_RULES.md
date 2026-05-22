@@ -94,6 +94,8 @@ Long-running work    → /goal to keep Claude working across turns
 
 ## When to Reset (30-60 Minute Rule)
 
+**30-60 minute reset rule:** Reset Claude Code session every 30-60 minutes to avoid context window overflow. When context exceeds 500K-800K tokens, precision degrades, repetition increases, and old context dominates new instructions. Use `/clear` for a full reset or `/compact` to compress while keeping key decisions.
+
 **Honest assessment:** The 30-60 minute rule is not an official Anthropic recommendation, but it reflects a real phenomenon. Context accumulates rapidly — tool outputs, diffs, file contents, and conversation history all fill the window. After 500K-800K tokens, Claude can become less precise, repeat itself, or fixate on earlier context at the expense of new instructions.
 
 **I agree partial resets help.** Full `/clear` every 30-60 minutes is too aggressive — you lose all accumulated project understanding. Better approach: **strategic compaction + goal-based continuity.**
