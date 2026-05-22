@@ -1,4 +1,4 @@
-# Python
+﻿# Python
 __pycache__/
 *.pyc
 *.pyo
@@ -19,6 +19,7 @@ env/
 
 # AI tools (exclude from Git, keep on disk)
 .claude/
+!.claude/settings.json
 .aider*
 
 # Logs & auto-generated changelogs
