@@ -184,3 +184,53 @@ git branch -d feature/new-feature   # only if fully merged
 
 ### Shared Resource Warning
 `.venv/` and `node_modules/` are gitignored and must be recreated in each new worktree. See Environment Setup above. Each worktree gets its own copy — no sharing between worktrees.
+
+---
+
+## Plan Mode → Execute
+
+[VERIFIED: 2026-05-22 — tested live in this session]
+
+### Confirmation
+`/plan` is CONFIRMED in Claude Code CLI. Command: `/plan [description]`. Also triggerable by Claude via the `EnterPlanMode` tool when a task is non-trivial.
+
+### Exact Command
+```
+/plan Add a docstring to hello.py
+```
+
+### What Plan Mode Can/Cannot Do (Observed)
+
+| Capability | Allowed? |
+|------------|----------|
+| Read files (Glob, Grep, Read) | YES |
+| Launch Explore/Plan agents | YES |
+| Write to plan file | YES (only file) |
+| Edit/Write project files | NO |
+| Run non-readonly Bash/PowerShell | NO |
+| Git commits | NO |
+
+### Approval Flow
+1. Claude explores codebase (Explore agents)
+2. Claude designs approach (Plan agent)
+3. Claude writes plan to `.claude/plans/<name>.md`
+4. Claude calls `ExitPlanMode`
+5. User reviews plan → approves or rejects
+6. On approval: Claude automatically enters execution mode with full write access
+7. Context is fully preserved across the transition
+
+### When to Use (This Project)
+
+**Triggers:**
+1. Multi-file feature touching `dashboard/` routes AND root Python files
+2. Architecture change — new Docker service, new API route group, new data flow
+3. Unfamiliar code — `diagnostics/` scripts, Polymarket logic, or anything in `dashboard/src/app/api/`
+
+**Anti-triggers (skip it):**
+1. Single-line change with clear scope (typo, docstring, rename)
+2. Mechanical refactor — rename across files, reformat, lint fix
+
+Caveat: if a "simple" task has unclear scope or hidden risk, use plan mode anyway. The cost of a bad change exceeds the cost of planning.
+
+### Token Savings
+No official Anthropic benchmark exists. User-reported estimates: 60-75% fewer tokens compared to jumping straight into code, because all writes are deferred until the approach is approved — no wasted edits from wrong approaches. [USER-REPORTED, NOT OFFICIAL]
